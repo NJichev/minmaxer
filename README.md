@@ -2,6 +2,12 @@
 
 A Chrome extension designed to optimize your soft reserves on softres.it by showing competition levels for your Best in Slot (BiS) items.
 
+## 📦 Repository
+
+- **GitHub**: https://github.com/NJichev/minmaxer
+- **Clone URL**: `git@github.com:NJichev/minmaxer.git`
+- **HTTPS Clone**: `https://github.com/NJichev/minmaxer.git`
+
 ## Features
 
 - **BiS Item Management**: Configure and save your Best in Slot items for different raids
@@ -25,7 +31,7 @@ A Chrome extension designed to optimize your soft reserves on softres.it by show
 
 1. **Download or clone this repository**
    ```bash
-   git clone <repository-url>
+   git clone git@github.com:NJichev/minmaxer.git
    cd minmaxer
    ```
 
@@ -142,11 +148,11 @@ minmaxer/
 
 ### Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly on softres.it
-5. Submit a pull request
+1. **Fork the repository**: https://github.com/NJichev/minmaxer/fork
+2. **Create a feature branch**: `git checkout -b feature/your-feature-name`
+3. **Make your changes**: Follow the existing code style and patterns
+4. **Test thoroughly**: Test on different softres.it raid pages
+5. **Submit a pull request**: Include a clear description of your changes
 
 ## License
 
@@ -154,7 +160,10 @@ This project is open source. Feel free to use, modify, and distribute.
 
 ## Support
 
-For issues, questions, or feature requests, please create an issue in the repository.
+For issues, questions, or feature requests, please create an issue in the repository:
+- **GitHub Issues**: https://github.com/NJichev/minmaxer/issues
+- **Bug Reports**: Include Chrome version, extension version, and steps to reproduce
+- **Feature Requests**: Describe your use case and expected behavior
 
 ---
 
