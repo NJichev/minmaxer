@@ -111,6 +111,7 @@ class SoftresAnalyzer {
         const raidKeywords = [
             'molten', 'core', 'mc',
             'blackwing', 'lair', 'bwl',
+            'zul\'gurub', 'zulgarub', 'zg',
             'ahn\'qiraj', 'aq20', 'aq40', 'ruins', 'temple',
             'naxxramas', 'naxx'
         ];
@@ -345,6 +346,8 @@ class SoftresAnalyzer {
             'MC': 'MC',
             'Blackwing Lair': 'BWL',
             'BWL': 'BWL',
+            'Zul\'Gurub': 'ZG',
+            'ZG': 'ZG',
             'Ruins of Ahn\'Qiraj': 'AQ20',
             'AQ20': 'AQ20',
             'Temple of Ahn\'Qiraj': 'AQ40',

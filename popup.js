@@ -363,6 +363,8 @@ class MinMaxerPopup {
             'MC': 'MC',
             'Blackwing Lair': 'BWL',
             'BWL': 'BWL',
+            'Zul\'Gurub': 'ZG',
+            'ZG': 'ZG',
             'Ruins of Ahn\'Qiraj': 'AQ20',
             'AQ20': 'AQ20',
             'Temple of Ahn\'Qiraj': 'AQ40',

@@ -21,6 +21,7 @@ A Chrome extension designed to optimize your soft reserves on softres.it by show
 
 - Molten Core (MC)
 - Blackwing Lair (BWL)
+- Zul'Gurub (ZG)
 - Ruins of Ahn'Qiraj (AQ20)
 - Temple of Ahn'Qiraj (AQ40)
 - Naxxramas (NAXX)
