@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinMaxer - BiS Manager</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚔️ MinMaxer</h1>
+            <p class="subtitle">BiS Soft Reserve Optimizer</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="dashboard">Dashboard</button>
+            <button class="tab-button" data-tab="bis-list">BiS List</button>
+            <button class="tab-button" data-tab="settings">Settings</button>
+        </div>
+
+        <div id="dashboard" class="tab-content active">
+            <div class="raid-info">
+                <h3 id="current-raid">No raid detected</h3>
+                <p id="raid-status">Visit a softres.it raid page to get started</p>
+            </div>
+
+            <div class="bis-items" id="bis-items-dashboard">
+                <h4>Your BiS Items Competition:</h4>
+                <div id="bis-competition-list">
+                    <p class="empty-state">No BiS items configured for this raid</p>
+                </div>
+            </div>
+
+            <div class="recommendations" id="recommendations">
+                <h4>💡 Recommendations:</h4>
+                <ul id="recommendation-list">
+                    <li>Configure your BiS items to see recommendations</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="bis-list" class="tab-content">
+            <div class="raid-selector">
+                <label for="raid-select">Raid:</label>
+                <select id="raid-select">
+                    <option value="">Select a raid...</option>
+                    <option value="MC">Molten Core</option>
+                    <option value="BWL">Blackwing Lair</option>
+                    <option value="AQ20">Ruins of Ahn'Qiraj</option>
+                    <option value="AQ40">Temple of Ahn'Qiraj</option>
+                    <option value="NAXX">Naxxramas</option>
+                </select>
+            </div>
+
+            <div class="bis-management">
+                <h4>BiS Items for <span id="selected-raid-name">Selected Raid</span>:</h4>
+                
+                <div class="add-item">
+                    <input type="text" id="item-input" placeholder="Enter item name..." />
+                    <button id="add-item-btn">Add Item</button>
+                </div>
+
+                <div class="bis-items-list" id="bis-items-list">
+                    <p class="empty-state">No BiS items configured. Add items above.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings" class="tab-content">
+            <div class="setting-group">
+                <label for="auto-analyze">
+                    <input type="checkbox" id="auto-analyze" checked>
+                    Auto-analyze when visiting softres pages
+                </label>
+            </div>
+
+            <div class="setting-group">
+                <label for="highlight-bis">
+                    <input type="checkbox" id="highlight-bis" checked>
+                    Highlight BiS items on softres pages
+                </label>
+            </div>
+
+            <div class="setting-group">
+                <label for="show-recommendations">
+                    <input type="checkbox" id="show-recommendations" checked>
+                    Show optimization recommendations
+                </label>
+            </div>
+
+            <div class="actions">
+                <button id="export-data" class="btn-secondary">Export BiS Data</button>
+                <button id="import-data" class="btn-secondary">Import BiS Data</button>
+                <button id="reset-data" class="btn-danger">Reset All Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html> 

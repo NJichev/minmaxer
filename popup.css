@@ -1,0 +1,325 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e1e2e 0%, #2d2d42 100%);
+    color: #ffffff;
+    min-width: 400px;
+    min-height: 500px;
+}
+
+.container {
+    padding: 16px;
+    max-width: 100%;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #3b3b54;
+}
+
+.header h1 {
+    font-size: 24px;
+    margin-bottom: 4px;
+    background: linear-gradient(45deg, #ffcd3c, #ff6b35);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    color: #a8a8b3;
+    font-size: 12px;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    background: #2d2d42;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: #a8a8b3;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+    background: #3b3b54;
+    color: #ffffff;
+}
+
+.tab-button.active {
+    background: #ffcd3c;
+    color: #1e1e2e;
+    font-weight: 600;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Dashboard */
+.raid-info {
+    background: #2d2d42;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.raid-info h3 {
+    color: #ffcd3c;
+    margin-bottom: 4px;
+}
+
+.raid-info p {
+    color: #a8a8b3;
+    font-size: 12px;
+}
+
+.bis-items, .recommendations {
+    background: #2d2d42;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.bis-items h4, .recommendations h4 {
+    margin-bottom: 12px;
+    color: #ffcd3c;
+    font-size: 14px;
+}
+
+/* BiS List Management */
+.raid-selector {
+    margin-bottom: 20px;
+}
+
+.raid-selector label {
+    display: block;
+    margin-bottom: 8px;
+    color: #ffcd3c;
+    font-weight: 600;
+}
+
+.raid-selector select {
+    width: 100%;
+    padding: 8px 12px;
+    background: #3b3b54;
+    border: 1px solid #4a4a5e;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.raid-selector select:focus {
+    outline: none;
+    border-color: #ffcd3c;
+}
+
+.bis-management {
+    background: #2d2d42;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.add-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.add-item input {
+    flex: 1;
+    padding: 8px 12px;
+    background: #3b3b54;
+    border: 1px solid #4a4a5e;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.add-item input:focus {
+    outline: none;
+    border-color: #ffcd3c;
+}
+
+.add-item button {
+    padding: 8px 16px;
+    background: #ffcd3c;
+    border: none;
+    border-radius: 6px;
+    color: #1e1e2e;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.add-item button:hover {
+    background: #ffd700;
+}
+
+/* BiS Items List */
+.bis-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: #3b3b54;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.bis-item-info {
+    flex: 1;
+}
+
+.bis-item-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.bis-item-count {
+    font-size: 12px;
+    color: #a8a8b3;
+}
+
+.bis-item-competition {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.competition-low {
+    background: #4ade80;
+    color: #1e1e2e;
+}
+
+.competition-medium {
+    background: #fbbf24;
+    color: #1e1e2e;
+}
+
+.competition-high {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.remove-item {
+    background: #ef4444;
+    border: none;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.remove-item:hover {
+    background: #dc2626;
+}
+
+/* Settings */
+.setting-group {
+    margin-bottom: 16px;
+}
+
+.setting-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 12px;
+    background: #2d2d42;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+.setting-group label:hover {
+    background: #3b3b54;
+}
+
+.setting-group input[type="checkbox"] {
+    accent-color: #ffcd3c;
+}
+
+.actions {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-secondary {
+    padding: 10px 16px;
+    background: #3b3b54;
+    border: 1px solid #4a4a5e;
+    border-radius: 6px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: #4a4a5e;
+    border-color: #5a5a6e;
+}
+
+.btn-danger {
+    padding: 10px 16px;
+    background: #ef4444;
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+/* Utility */
+.empty-state {
+    color: #a8a8b3;
+    font-style: italic;
+    text-align: center;
+    padding: 16px;
+}
+
+/* Recommendations */
+#recommendation-list {
+    list-style: none;
+}
+
+#recommendation-list li {
+    padding: 8px 12px;
+    background: #3b3b54;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border-left: 4px solid #ffcd3c;
+} 

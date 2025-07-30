@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="#1e1e2e" stroke="#ffcd3c" stroke-width="4"/>
+  
+  <!-- Sword -->
+  <g transform="translate(64, 64)">
+    <!-- Blade -->
+    <rect x="-2" y="-35" width="4" height="30" fill="#c0c0c0"/>
+    <!-- Crossguard -->
+    <rect x="-12" y="-8" width="24" height="3" fill="#ffcd3c"/>
+    <!-- Handle -->
+    <rect x="-3" y="-5" width="6" height="20" fill="#8b4513"/>
+    <!-- Pommel -->
+    <circle cx="0" cy="18" r="4" fill="#ffcd3c"/>
+  </g>
+  
+  <!-- Stats symbols -->
+  <g transform="translate(30, 30)">
+    <!-- Up arrow (max) -->
+    <polygon points="0,8 4,0 8,8" fill="#4ade80"/>
+  </g>
+  
+  <g transform="translate(90, 30)">
+    <!-- Down arrow (min) -->
+    <polygon points="0,0 4,8 8,0" fill="#ef4444"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="64" y="110" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#ffcd3c">
+    MinMaxer
+  </text>
+</svg>
