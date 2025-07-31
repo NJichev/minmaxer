@@ -708,10 +708,10 @@ class MinMaxerPopup {
 
 // Initialize popup
 try {
-    this.log('MinMaxer: Creating popup instance...');
+    console.log('MinMaxer: Creating popup instance...');
     const popup = new MinMaxerPopup();
     window.popup = popup; // Make it globally accessible for onclick handlers
-    this.log('MinMaxer: Popup instance created successfully');
+    console.log('MinMaxer: Popup instance created successfully');
 } catch (error) {
     console.error('MinMaxer: Error creating popup:', error);
 } 
