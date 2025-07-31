@@ -5,7 +5,16 @@ class SoftresAnalyzer {
         this.softresData = null;
         this.bisHighlights = [];
         
+        // Debug flag - set to true to enable debug logging
+        this.DEBUG = false;
+        
         this.init();
+    }
+    
+    log(...args) {
+        if (this.DEBUG) {
+            console.log(...args);
+        }
     }
 
     init() {
@@ -128,7 +137,7 @@ class SoftresAnalyzer {
             const rows = reservedTable.querySelectorAll('tr');
             // Subtract 1 for header row
             const playerCount = Math.max(0, rows.length - 1);
-            console.log(`MinMaxer: Counted ${playerCount} players from #table-reserved (${rows.length} total rows)`);
+            this.log(`MinMaxer: Counted ${playerCount} players from #table-reserved (${rows.length} total rows)`);
             return playerCount;
         }
         
@@ -138,7 +147,7 @@ class SoftresAnalyzer {
             return tableRows.length - 1;
         }
         
-        console.log('MinMaxer: No reserved table found, returning 0 players');
+        this.log('MinMaxer: No reserved table found, returning 0 players');
         return 0;
     }
 
@@ -158,8 +167,8 @@ class SoftresAnalyzer {
         // Convert Map to plain object for Chrome messaging compatibility
         const itemReserveObject = Object.fromEntries(itemReserveMap);
         const playerReservesObject = Object.fromEntries(playerReservesMap);
-        console.log(`MinMaxer: Converted Map (${itemReserveMap.size} items) to Object (${Object.keys(itemReserveObject).length} keys)`);
-        console.log(`MinMaxer: Built player reserves map with ${playerReservesMap.size} players`);
+        this.log(`MinMaxer: Converted Map (${itemReserveMap.size} items) to Object (${Object.keys(itemReserveObject).length} keys)`);
+        this.log(`MinMaxer: Built player reserves map with ${playerReservesMap.size} players`);
         
         this.softresData = {
             itemReserveMap: itemReserveObject, // Convert Map to Object for messaging
@@ -191,12 +200,12 @@ class SoftresAnalyzer {
         const itemsTable = document.querySelector('#table-items');
         
         if (!itemsTable) {
-            console.log('MinMaxer: Items table (#table-items) not found');
+            this.log('MinMaxer: Items table (#table-items) not found');
             return itemMap;
         }
         
         const rows = itemsTable.querySelectorAll('tr');
-        console.log(`MinMaxer: Found items table with ${rows.length} rows`);
+        this.log(`MinMaxer: Found items table with ${rows.length} rows`);
         
         for (const row of rows) {
             const cells = row.querySelectorAll('td, th');
@@ -230,11 +239,11 @@ class SoftresAnalyzer {
                 
                 // Debug logging for Eye of C'thun specifically
                 if (itemName.includes("Eye of C'Thun") || itemName.includes("Eye of C'thun")) {
-                    console.log('MinMaxer DEBUG: Eye of C\'thun found!');
-                    console.log('- Item name:', itemName);
-                    console.log('- Reserve cell HTML:', reserveCell.innerHTML);
-                    console.log('- Player divs found:', playerDivs.length);
-                    console.log('- Player divs:', playerDivs);
+                    this.log('MinMaxer DEBUG: Eye of C\'thun found!');
+                    this.log('- Item name:', itemName);
+                    this.log('- Reserve cell HTML:', reserveCell.innerHTML);
+                    this.log('- Player divs found:', playerDivs.length);
+                    this.log('- Player divs:', playerDivs);
                 }
                 
                 // Add to map
@@ -242,19 +251,19 @@ class SoftresAnalyzer {
             }
         }
         
-        console.log(`MinMaxer: Built item reserve map with ${itemMap.size} items from #table-items`);
+        this.log(`MinMaxer: Built item reserve map with ${itemMap.size} items from #table-items`);
         
         // Debug: Show some items in the map, especially Eye of C'thun
         const eyeOfCthun = itemMap.get("Eye of C'Thun");
         if (eyeOfCthun !== undefined) {
-            console.log(`MinMaxer DEBUG: "Eye of C'Thun" in map with count: ${eyeOfCthun}`);
+            this.log(`MinMaxer DEBUG: "Eye of C'Thun" in map with count: ${eyeOfCthun}`);
         }
         
         // Show a few items from the map for debugging
         let debugCount = 0;
         for (const [name, count] of itemMap.entries()) {
             if (count > 0 && debugCount < 5) {
-                console.log(`MinMaxer DEBUG: "${name}" => ${count} reserves`);
+                this.log(`MinMaxer DEBUG: "${name}" => ${count} reserves`);
                 debugCount++;
             }
         }
@@ -269,12 +278,12 @@ class SoftresAnalyzer {
         const reservedTable = document.querySelector('#table-reserved');
         
         if (!reservedTable) {
-            console.log('MinMaxer: Reserved table (#table-reserved) not found');
+            this.log('MinMaxer: Reserved table (#table-reserved) not found');
             return playerMap;
         }
         
         const rows = reservedTable.querySelectorAll('tr');
-        console.log(`MinMaxer: Found reserved table with ${rows.length} rows`);
+        this.log(`MinMaxer: Found reserved table with ${rows.length} rows`);
         
         for (const row of rows) {
             const cells = row.querySelectorAll('td, th');
@@ -316,12 +325,20 @@ class SoftresAnalyzer {
                 
                 if (items.length > 0) {
                     playerMap.set(playerName, items);
-                    console.log(`MinMaxer: Player "${playerName}" has ${items.length} reserves:`, items.join(', '));
+                    this.log(`MinMaxer: Player "${playerName}" has ${items.length} reserves:`, items.join(', '));
+                } else {
+                    this.log(`MinMaxer: Player "${playerName}" found but no valid items parsed`);
                 }
             }
         }
         
-        console.log(`MinMaxer: Built player reserves map with ${playerMap.size} players`);
+        this.log(`MinMaxer: Built player reserves map with ${playerMap.size} players`);
+        
+        // Debug: Show all players found
+        for (const [player, items] of playerMap.entries()) {
+            this.log(`MinMaxer: "${player}" => [${items.join(', ')}]`);
+        }
+        
         return playerMap;
     }
 
@@ -485,9 +502,9 @@ class SoftresAnalyzer {
                 break;
                 
             case 'getSoftresData':
-                console.log('MinMaxer: Sending softresData:', !!this.softresData, 'keys:', this.softresData ? Object.keys(this.softresData) : 'null');
+                this.log('MinMaxer: Sending softresData:', !!this.softresData, 'keys:', this.softresData ? Object.keys(this.softresData) : 'null');
                 if (this.softresData?.itemReserveMap) {
-                    console.log('MinMaxer: itemReserveMap type:', typeof this.softresData.itemReserveMap, 'keys:', Object.keys(this.softresData.itemReserveMap).length);
+                    this.log('MinMaxer: itemReserveMap type:', typeof this.softresData.itemReserveMap, 'keys:', Object.keys(this.softresData.itemReserveMap).length);
                 }
                 sendResponse(this.softresData);
                 break;

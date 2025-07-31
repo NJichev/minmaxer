@@ -101,6 +101,15 @@ The extension categorizes competition into three levels:
 4. **Update your BiS list** as your gear progresses
 5. **Export your BiS data** to back up your configurations
 
+## Debugging
+
+Debug logging is disabled by default for better performance. To enable debug logging:
+
+1. **For popup debugging**: Open `popup.js` and change `this.DEBUG = false;` to `this.DEBUG = true;`
+2. **For content script debugging**: Open `content.js` and change `this.DEBUG = false;` to `this.DEBUG = true;`
+
+Debug logs will then appear in the browser console with the `MinMaxer:` prefix.
+
 ## Troubleshooting
 
 ### Extension not working on softres.it

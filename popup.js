@@ -12,20 +12,29 @@ class MinMaxerPopup {
             characterName: ''
         };
         
+        // Debug flag - set to true to enable debug logging
+        this.DEBUG = false;
+        
         this.init();
+    }
+    
+    log(...args) {
+        if (this.DEBUG) {
+            console.log(...args);
+        }
     }
 
     async init() {
-        console.log('MinMaxer: Popup init() starting...');
+        this.log('MinMaxer: Popup init() starting...');
         await this.loadStoredData();
-        console.log('MinMaxer: Stored data loaded');
+        this.log('MinMaxer: Stored data loaded');
         this.setupEventListeners();
         this.setupTabs();
-        console.log('MinMaxer: Event listeners and tabs setup');
+        this.log('MinMaxer: Event listeners and tabs setup');
         await this.updateCurrentRaidInfo();
-        console.log('MinMaxer: Current raid info updated');
+        this.log('MinMaxer: Current raid info updated');
         this.updateUI();
-        console.log('MinMaxer: UI updated, init() complete');
+        this.log('MinMaxer: UI updated, init() complete');
     }
 
     async loadStoredData() {
@@ -150,31 +159,35 @@ class MinMaxerPopup {
                 
                 // If no raid data yet, trigger reanalysis and try again
                 if (!response || !response.raidName) {
-                    console.log('MinMaxer: No raid data, triggering reanalysis...');
+                    this.log('MinMaxer: No raid data, triggering reanalysis...');
                     await chrome.tabs.sendMessage(tab.id, { action: 'reanalyze' });
                     response = await chrome.tabs.sendMessage(tab.id, { action: 'getRaidInfo' });
                 }
                 
-                console.log('MinMaxer: Raid info response:', response);
+                this.log('MinMaxer: Raid info response:', response);
                 
                 if (response && response.raidName) {
-                    console.log('MinMaxer: Setting currentRaid to:', response);
+                    this.log('MinMaxer: Setting currentRaid to:', response);
                     this.currentRaid = response;
                     document.getElementById('current-raid').textContent = response.raidName;
                     document.getElementById('raid-status').textContent = `${response.totalPlayers || 'Unknown'} players registered`;
                     
                     // Also get soft reserve data
                     const softresResponse = await chrome.tabs.sendMessage(tab.id, { action: 'getSoftresData' });
-                    console.log('MinMaxer: Softres response received:', !!softresResponse, 'keys:', softresResponse ? Object.keys(softresResponse) : 'null');
+                    this.log('MinMaxer: Softres response received:', !!softresResponse, 'keys:', softresResponse ? Object.keys(softresResponse) : 'null');
                     if (softresResponse) {
-                        console.log('MinMaxer: itemReserveMap in response:', !!softresResponse.itemReserveMap, 'type:', typeof softresResponse.itemReserveMap);
+                        this.log('MinMaxer: itemReserveMap in response:', !!softresResponse.itemReserveMap, 'type:', typeof softresResponse.itemReserveMap);
+                        this.log('MinMaxer: playerReservesMap in response:', !!softresResponse.playerReservesMap, 'players:', softresResponse.playerReservesMap ? Object.keys(softresResponse.playerReservesMap).length : 0);
+                        if (softresResponse.playerReservesMap) {
+                            this.log('MinMaxer: Player names found:', Object.keys(softresResponse.playerReservesMap));
+                        }
                         this.softresData = softresResponse;
                         this.availableItems = softresResponse.availableItems || [];
                         this.setupAutoComplete();
                     }
                     
                     // Update BiS competition display after setting currentRaid
-                    console.log('MinMaxer: About to call updateBisCompetitionDisplay()');
+                    this.log('MinMaxer: About to call updateBisCompetitionDisplay()');
                     this.updateBisCompetitionDisplay();
                 } else {
                     this.currentRaid = null;
@@ -206,10 +219,10 @@ class MinMaxerPopup {
         const itemName = input.value.trim();
         const selectedRaid = document.getElementById('raid-select').value;
         
-        console.log('MinMaxer: Adding BiS item:');
-        console.log('- Item name:', itemName);
-        console.log('- Selected raid key:', selectedRaid);
-        console.log('- Selected raid text:', document.querySelector(`option[value="${selectedRaid}"]`)?.textContent);
+        this.log('MinMaxer: Adding BiS item:');
+        this.log('- Item name:', itemName);
+        this.log('- Selected raid key:', selectedRaid);
+        this.log('- Selected raid text:', document.querySelector(`option[value="${selectedRaid}"]`)?.textContent);
         
         if (!itemName || !selectedRaid) {
             alert('Please select a raid and enter an item name');
@@ -263,6 +276,8 @@ class MinMaxerPopup {
             
             // Build the reserve count display
             let reserveDisplay = '';
+            this.log(`MinMaxer: [BiS List] Building display for "${item.name}" - Competition: ${details.competitionCount}, Yours: ${details.yourCount}`);
+            
             if (details.yourCount > 0) {
                 reserveDisplay = `${details.competitionCount} competition`;
                 if (details.yourCount > 0) {
@@ -271,6 +286,8 @@ class MinMaxerPopup {
             } else {
                 reserveDisplay = `${details.competitionCount} soft reserves`;
             }
+            
+            this.log(`MinMaxer: [BiS List] Generated reserveDisplay: "${reserveDisplay}"`);
             
             return `
                 <div class="bis-item">
@@ -295,12 +312,12 @@ class MinMaxerPopup {
     }
 
     updateBisCompetitionDisplay() {
-        console.log('MinMaxer: === updateBisCompetitionDisplay() START ===');
+        this.log('MinMaxer: === updateBisCompetitionDisplay() START ===');
         
         const container = document.getElementById('bis-competition-list');
-        console.log('MinMaxer: Competition container found:', !!container);
+        this.log('MinMaxer: Competition container found:', !!container);
         
-        console.log('MinMaxer: currentRaid:', this.currentRaid);
+        this.log('MinMaxer: currentRaid:', this.currentRaid);
         
         if (!this.currentRaid) {
             container.innerHTML = '<p class="empty-state">No raid detected</p>';
@@ -311,7 +328,7 @@ class MinMaxerPopup {
         const currentRaidType = this.detectRaidType(this.currentRaid.raidName);
         const bisItems = this.bisData[currentRaidType] || [];
         
-        console.log(`MinMaxer: Competition - raid: ${this.currentRaid.raidName}, type: ${currentRaidType}, items: ${bisItems.length}`);
+        this.log(`MinMaxer: Competition - raid: ${this.currentRaid.raidName}, type: ${currentRaidType}, items: ${bisItems.length}`);
         
         if (bisItems.length === 0) {
             container.innerHTML = '<p class="empty-state">No BiS items configured for this raid</p>';
@@ -324,6 +341,8 @@ class MinMaxerPopup {
             
             // Build the reserve count display
             let reserveDisplay = '';
+            this.log(`MinMaxer: [Dashboard] Building display for "${item.name}" - Competition: ${details.competitionCount}, Yours: ${details.yourCount}`);
+            
             if (details.yourCount > 0) {
                 reserveDisplay = `${details.competitionCount} competition`;
                 if (details.yourCount > 0) {
@@ -332,6 +351,8 @@ class MinMaxerPopup {
             } else {
                 reserveDisplay = `${details.competitionCount} soft reserves`;
             }
+            
+            this.log(`MinMaxer: [Dashboard] Generated reserveDisplay: "${reserveDisplay}"`);
             
             return `
                 <div class="bis-item">
@@ -458,19 +479,31 @@ class MinMaxerPopup {
         let yourCount = 0;
         const characterName = this.settings.characterName;
         
+        this.log(`MinMaxer: Character name setting: "${characterName}"`);
+        this.log(`MinMaxer: Player reserves available:`, !!this.softresData?.playerReservesMap);
+        
         if (characterName && foundItemName && this.softresData?.playerReservesMap) {
             const playerReservesData = this.softresData.playerReservesMap;
+            this.log(`MinMaxer: Available players:`, Object.keys(playerReservesData));
+            
             const playerReserves = playerReservesData[characterName] || [];
+            this.log(`MinMaxer: Reserves for "${characterName}":`, playerReserves);
             
             // Count how many times this item appears in the user's reserves
             yourCount = playerReserves.filter(item => 
                 item.toLowerCase() === foundItemName.toLowerCase()
             ).length;
+            
+            this.log(`MinMaxer: Found ${yourCount} instances of "${foundItemName}" for "${characterName}"`);
+        } else {
+            if (!characterName) this.log(`MinMaxer: No character name set`);
+            if (!foundItemName) this.log(`MinMaxer: No item found`);
+            if (!this.softresData?.playerReservesMap) this.log(`MinMaxer: No player reserves data`);
         }
         
         const competitionCount = Math.max(0, totalCount - yourCount);
         
-        console.log(`MinMaxer: Item "${itemName}" - Total: ${totalCount}, Your: ${yourCount}, Competition: ${competitionCount}`);
+        this.log(`MinMaxer: Item "${itemName}" - Total: ${totalCount}, Your: ${yourCount}, Competition: ${competitionCount}`);
         
         return {
             totalCount: totalCount,
@@ -638,26 +671,26 @@ class MinMaxerPopup {
             datalist.appendChild(option);
         });
 
-        console.log(`MinMaxer: Added ${this.availableItems.length} items for auto-completion`);
+        this.log(`MinMaxer: Added ${this.availableItems.length} items for auto-completion`);
     }
 
     updateUI() {
-        console.log('MinMaxer: updateUI() called');
+        this.log('MinMaxer: updateUI() called');
         
         // Update raid selection if current raid is detected
         if (this.currentRaid) {
             const raidType = this.detectRaidType(this.currentRaid.raidName);
-            console.log('MinMaxer: updateUI raid detection:');
-            console.log('- Current raid name:', this.currentRaid.raidName);
-            console.log('- Detected raid type:', raidType);
+            this.log('MinMaxer: updateUI raid detection:');
+            this.log('- Current raid name:', this.currentRaid.raidName);
+            this.log('- Detected raid type:', raidType);
             
             if (raidType !== 'UNKNOWN') {
-                console.log('- Setting dropdown to:', raidType);
+                this.log('- Setting dropdown to:', raidType);
                 document.getElementById('raid-select').value = raidType;
                 this.selectRaid(raidType);
             }
         } else {
-            console.log('MinMaxer: No currentRaid in updateUI()');
+            this.log('MinMaxer: No currentRaid in updateUI()');
         }
         
         this.updateBisCompetitionDisplay();
@@ -675,10 +708,10 @@ class MinMaxerPopup {
 
 // Initialize popup
 try {
-    console.log('MinMaxer: Creating popup instance...');
+    this.log('MinMaxer: Creating popup instance...');
     const popup = new MinMaxerPopup();
     window.popup = popup; // Make it globally accessible for onclick handlers
-    console.log('MinMaxer: Popup instance created successfully');
+    this.log('MinMaxer: Popup instance created successfully');
 } catch (error) {
     console.error('MinMaxer: Error creating popup:', error);
 } 
