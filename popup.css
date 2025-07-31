@@ -206,6 +206,11 @@ body {
     color: #a8a8b3;
 }
 
+.your-reserves {
+    color: #4ade80;
+    font-weight: 600;
+}
+
 .bis-item-competition {
     padding: 4px 8px;
     border-radius: 4px;
@@ -265,6 +270,42 @@ body {
 
 .setting-group input[type="checkbox"] {
     accent-color: #ffcd3c;
+}
+
+/* Character name input styling */
+.setting-group label[for="character-name"] {
+    display: block;
+    cursor: default;
+    padding: 8px 0;
+    background: none;
+    color: #ffcd3c;
+    font-weight: 600;
+}
+
+.setting-group label[for="character-name"]:hover {
+    background: none;
+}
+
+.form-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: #3b3b54;
+    border: 1px solid #4a4a5e;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #ffcd3c;
+}
+
+.help-text {
+    color: #a8a8b3;
+    font-size: 11px;
+    font-style: italic;
 }
 
 .actions {

@@ -146,6 +146,9 @@ class SoftresAnalyzer {
         // Build a simple item name => soft reserve count map from the items table
         const itemReserveMap = this.buildItemReserveMap();
         
+        // Build player reserves map from the reserved table
+        const playerReservesMap = this.buildPlayerReservesMap();
+        
         // Convert map to array format for compatibility
         const itemsArray = Array.from(itemReserveMap.entries()).map(([name, count]) => ({
             name: name,
@@ -154,10 +157,13 @@ class SoftresAnalyzer {
         
         // Convert Map to plain object for Chrome messaging compatibility
         const itemReserveObject = Object.fromEntries(itemReserveMap);
+        const playerReservesObject = Object.fromEntries(playerReservesMap);
         console.log(`MinMaxer: Converted Map (${itemReserveMap.size} items) to Object (${Object.keys(itemReserveObject).length} keys)`);
+        console.log(`MinMaxer: Built player reserves map with ${playerReservesMap.size} players`);
         
         this.softresData = {
             itemReserveMap: itemReserveObject, // Convert Map to Object for messaging
+            playerReservesMap: playerReservesObject, // Player => [items] mapping
             items: itemsArray, // For compatibility
             availableItems: itemsArray, // For auto-completion
             totalItems: itemsArray.length,
@@ -256,7 +262,68 @@ class SoftresAnalyzer {
         return itemMap;
     }
 
-
+    buildPlayerReservesMap() {
+        const playerMap = new Map();
+        
+        // Target the reserved table by ID
+        const reservedTable = document.querySelector('#table-reserved');
+        
+        if (!reservedTable) {
+            console.log('MinMaxer: Reserved table (#table-reserved) not found');
+            return playerMap;
+        }
+        
+        const rows = reservedTable.querySelectorAll('tr');
+        console.log(`MinMaxer: Found reserved table with ${rows.length} rows`);
+        
+        for (const row of rows) {
+            const cells = row.querySelectorAll('td, th');
+            if (cells.length < 3) continue; // Need at least 3 columns: Name, Class, Items
+            
+            // Column 1: Player name (index 0)
+            const nameCell = cells[0];
+            let playerName = null;
+            if (nameCell) {
+                // Look for player name in the span or use cell text directly
+                const nameSpan = nameCell.querySelector('span[title]');
+                if (nameSpan) {
+                    playerName = nameSpan.textContent.trim();
+                } else {
+                    const text = nameCell.textContent.trim();
+                    if (text && text.length > 1 && !text.match(/^(name|player)$/i)) {
+                        playerName = text;
+                    }
+                }
+            }
+            
+            // Column 3: Items (index 2)
+            const itemsCell = cells[2];
+            if (playerName && itemsCell) {
+                const itemLinks = itemsCell.querySelectorAll('a[href*="wowhead"], a[href*="classicdb"], a[href*="wowdb"]');
+                const items = [];
+                
+                itemLinks.forEach(link => {
+                    const itemText = link.querySelector('.itemlink-text');
+                    if (itemText) {
+                        let itemName = itemText.textContent.trim();
+                        // Remove any "(2x)" or similar suffixes
+                        itemName = itemName.replace(/\s*\(\d+x\)\s*$/, '');
+                        if (itemName) {
+                            items.push(itemName);
+                        }
+                    }
+                });
+                
+                if (items.length > 0) {
+                    playerMap.set(playerName, items);
+                    console.log(`MinMaxer: Player "${playerName}" has ${items.length} reserves:`, items.join(', '));
+                }
+            }
+        }
+        
+        console.log(`MinMaxer: Built player reserves map with ${playerMap.size} players`);
+        return playerMap;
+    }
 
 
 

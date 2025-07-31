@@ -47,7 +47,8 @@ class MinMaxerBackground {
             autoAnalyze: true,
             highlightBis: true,
             showRecommendations: true,
-            notificationsEnabled: true
+            notificationsEnabled: true,
+            characterName: ''
         };
 
         const defaultBisData = {};

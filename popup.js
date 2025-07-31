@@ -8,7 +8,8 @@ class MinMaxerPopup {
         this.settings = {
             autoAnalyze: true,
             highlightBis: true,
-            showRecommendations: true
+            showRecommendations: true,
+            characterName: ''
         };
         
         this.init();
@@ -37,6 +38,7 @@ class MinMaxerPopup {
             document.getElementById('auto-analyze').checked = this.settings.autoAnalyze;
             document.getElementById('highlight-bis').checked = this.settings.highlightBis;
             document.getElementById('show-recommendations').checked = this.settings.showRecommendations;
+            document.getElementById('character-name').value = this.settings.characterName;
         this.toggleRecommendations(this.settings.showRecommendations);
         } catch (error) {
             console.error('Error loading stored data:', error);
@@ -92,6 +94,11 @@ class MinMaxerPopup {
         document.getElementById('show-recommendations').addEventListener('change', (e) => {
             this.settings.showRecommendations = e.target.checked;
             this.toggleRecommendations(e.target.checked);
+            this.saveData();
+        });
+
+        document.getElementById('character-name').addEventListener('input', (e) => {
+            this.settings.characterName = e.target.value.trim();
             this.saveData();
         });
 
@@ -251,14 +258,25 @@ class MinMaxerPopup {
         }
         
         container.innerHTML = items.map((item, index) => {
-            const count = this.getItemSoftresCount(item.name);
-            const competition = this.getCompetitionLevel(count);
+            const details = this.getItemSoftresDetails(item.name);
+            const competition = this.getCompetitionLevel(details.competitionCount);
+            
+            // Build the reserve count display
+            let reserveDisplay = '';
+            if (details.yourCount > 0) {
+                reserveDisplay = `${details.competitionCount} competition`;
+                if (details.yourCount > 0) {
+                    reserveDisplay += ` <span class="your-reserves">+${details.yourCount} yours</span>`;
+                }
+            } else {
+                reserveDisplay = `${details.competitionCount} soft reserves`;
+            }
             
             return `
                 <div class="bis-item">
                     <div class="bis-item-info">
                         <div class="bis-item-name">${item.name}</div>
-                        <div class="bis-item-count">${count} soft reserves</div>
+                        <div class="bis-item-count">${reserveDisplay}</div>
                     </div>
                     <span class="bis-item-competition competition-${competition.level}">${competition.text}</span>
                     <button class="remove-item" data-raid="${raidType}" data-item="${item.name}" data-index="${index}">×</button>
@@ -301,14 +319,25 @@ class MinMaxerPopup {
         }
         
         container.innerHTML = bisItems.map(item => {
-            const count = this.getItemSoftresCount(item.name);
-            const competition = this.getCompetitionLevel(count);
+            const details = this.getItemSoftresDetails(item.name);
+            const competition = this.getCompetitionLevel(details.competitionCount);
+            
+            // Build the reserve count display
+            let reserveDisplay = '';
+            if (details.yourCount > 0) {
+                reserveDisplay = `${details.competitionCount} competition`;
+                if (details.yourCount > 0) {
+                    reserveDisplay += ` <span class="your-reserves">+${details.yourCount} yours</span>`;
+                }
+            } else {
+                reserveDisplay = `${details.competitionCount} soft reserves`;
+            }
             
             return `
                 <div class="bis-item">
                     <div class="bis-item-info">
                         <div class="bis-item-name">${item.name}</div>
-                        <div class="bis-item-count">${count} soft reserves</div>
+                        <div class="bis-item-count">${reserveDisplay}</div>
                     </div>
                     <span class="bis-item-competition competition-${competition.level}">${competition.text}</span>
                 </div>
@@ -325,11 +354,15 @@ class MinMaxerPopup {
         const recommendations = [];
         
         // Analyze BiS items and generate recommendations
-        const sortedItems = bisItems.map(item => ({
-            ...item,
-            count: this.getItemSoftresCount(item.name),
-            competition: this.getCompetitionLevel(this.getItemSoftresCount(item.name))
-        })).sort((a, b) => a.count - b.count);
+        const sortedItems = bisItems.map(item => {
+            const details = this.getItemSoftresDetails(item.name);
+            return {
+                ...item,
+                count: details.competitionCount,
+                yourCount: details.yourCount,
+                competition: this.getCompetitionLevel(details.competitionCount)
+            };
+        }).sort((a, b) => a.count - b.count);
         
         if (sortedItems.length > 0) {
             // Recommend items with lowest competition
@@ -383,49 +416,72 @@ class MinMaxerPopup {
         return 'UNKNOWN';
     }
 
-    getItemSoftresCount(itemName) {
-        console.log('MinMaxer: getItemSoftresCount - softresData:', !!this.softresData, 'itemReserveMap:', !!this.softresData?.itemReserveMap);
-        
+    getItemSoftresDetails(itemName) {
         if (!this.softresData?.itemReserveMap) {
-            console.log('MinMaxer: No itemReserveMap in softresData');
-            console.log('MinMaxer: softresData keys:', this.softresData ? Object.keys(this.softresData) : 'null');
-            return 0;
+            return { totalCount: 0, competitionCount: 0, yourCount: 0 };
         }
         
         const mapData = this.softresData.itemReserveMap;
-        console.log('MinMaxer: mapData type:', typeof mapData, 'keys:', Object.keys(mapData || {}).length);
-        
-        // Convert plain object to Map (content script stores as object for Chrome messaging)
         const map = new Map(Object.entries(mapData || {}));
         
-        console.log(`MinMaxer: Looking up "${itemName}", map has ${map.size} items`);
+        let totalCount = 0;
+        let foundItemName = null;
         
         // First try exact match
         if (map.has(itemName)) {
-            const count = map.get(itemName);
-            console.log(`MinMaxer: Found "${itemName}" => ${count}`);
-            return count;
-        }
-        
-        // If no exact match, try case-insensitive exact match
-        for (const [name, count] of map.entries()) {
-            if (name.toLowerCase() === itemName.toLowerCase()) {
-                console.log(`MinMaxer: Found "${itemName}" as "${name}" => ${count}`);
-                return count;
+            totalCount = map.get(itemName);
+            foundItemName = itemName;
+        } else {
+            // If no exact match, try case-insensitive exact match
+            for (const [name, count] of map.entries()) {
+                if (name.toLowerCase() === itemName.toLowerCase()) {
+                    totalCount = count;
+                    foundItemName = name;
+                    break;
+                }
+            }
+            
+            // If still no match, try partial match
+            if (!foundItemName) {
+                for (const [name, count] of map.entries()) {
+                    if (name.toLowerCase().includes(itemName.toLowerCase()) || 
+                        itemName.toLowerCase().includes(name.toLowerCase())) {
+                        totalCount = count;
+                        foundItemName = name;
+                        break;
+                    }
+                }
             }
         }
         
-        // If still no match, try partial match
-        for (const [name, count] of map.entries()) {
-            if (name.toLowerCase().includes(itemName.toLowerCase()) || 
-                itemName.toLowerCase().includes(name.toLowerCase())) {
-                console.log(`MinMaxer: Partial match "${itemName}" as "${name}" => ${count}`);
-                return count;
-            }
+        // Count how many times the user has this item reserved
+        let yourCount = 0;
+        const characterName = this.settings.characterName;
+        
+        if (characterName && foundItemName && this.softresData?.playerReservesMap) {
+            const playerReservesData = this.softresData.playerReservesMap;
+            const playerReserves = playerReservesData[characterName] || [];
+            
+            // Count how many times this item appears in the user's reserves
+            yourCount = playerReserves.filter(item => 
+                item.toLowerCase() === foundItemName.toLowerCase()
+            ).length;
         }
         
-        console.log(`MinMaxer: No match for "${itemName}"`);
-        return 0;
+        const competitionCount = Math.max(0, totalCount - yourCount);
+        
+        console.log(`MinMaxer: Item "${itemName}" - Total: ${totalCount}, Your: ${yourCount}, Competition: ${competitionCount}`);
+        
+        return {
+            totalCount: totalCount,
+            competitionCount: competitionCount,
+            yourCount: yourCount
+        };
+    }
+
+    getItemSoftresCount(itemName) {
+        // For backwards compatibility, return competition count (excluding user's reserves)
+        return this.getItemSoftresDetails(itemName).competitionCount;
     }
 
     getCompetitionLevel(count) {
