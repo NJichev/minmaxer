@@ -7,7 +7,7 @@
 }
 
 .minmaxer-highlight:hover {
-    background-color: #ffcd3c66 !important;
+    opacity: 0.8 !important;
     transform: scale(1.02) !important;
 }
 
@@ -16,8 +16,8 @@
     position: absolute;
     top: -5px;
     right: -5px;
-    background: #ffcd3c;
-    color: #1e1e2e;
+    background: currentColor;
+    color: white;
     border-radius: 50%;
     width: 20px;
     height: 20px;
@@ -27,6 +27,7 @@
     font-size: 10px;
     font-weight: bold;
     z-index: 1000;
+    mix-blend-mode: multiply;
 }
 
 /* MinMaxer Sidebar Panel */

@@ -412,10 +412,12 @@ class SoftresAnalyzer {
 
             if (bisItems.length === 0) return;
 
-            // Find and highlight BiS items on the page
-            bisItems.forEach(bisItem => {
-                this.highlightItem(bisItem.name);
-            });
+            // Find and highlight BiS items on the page with competition-based colors
+            for (const bisItem of bisItems) {
+                const details = await this.getItemSoftresDetails(bisItem.name);
+                const competition = this.getCompetitionLevel(details.competitionCount);
+                this.highlightItem(bisItem.name, competition.level);
+            }
 
         } catch (error) {
             console.error('MinMaxer: Error highlighting BiS items:', error);
@@ -450,7 +452,90 @@ class SoftresAnalyzer {
         return 'UNKNOWN';
     }
 
-    highlightItem(itemName) {
+    getCompetitionLevel(count) {
+        if (count <= 2) {
+            return { level: 'low', text: 'Low' };
+        } else if (count <= 5) {
+            return { level: 'medium', text: 'Medium' };
+        } else {
+            return { level: 'high', text: 'High' };
+        }
+    }
+
+    getCompetitionColors(level) {
+        const colors = {
+            low: { bg: '#4ade80', border: '#22c55e', bgAlpha: 'rgba(74, 222, 128, 0.2)' },
+            medium: { bg: '#fbbf24', border: '#f59e0b', bgAlpha: 'rgba(251, 191, 36, 0.2)' },
+            high: { bg: '#ef4444', border: '#dc2626', bgAlpha: 'rgba(239, 68, 68, 0.2)' }
+        };
+        return colors[level] || colors.medium;
+    }
+
+    async getItemSoftresDetails(itemName) {
+        if (!this.softresData?.itemReserveMap) {
+            return { totalCount: 0, competitionCount: 0, yourCount: 0 };
+        }
+        
+        const mapData = this.softresData.itemReserveMap;
+        const map = new Map(Object.entries(mapData || {}));
+        
+        let totalCount = 0;
+        let foundItemName = null;
+        
+        // First try exact match
+        if (map.has(itemName)) {
+            totalCount = map.get(itemName);
+            foundItemName = itemName;
+        } else {
+            // If no exact match, try case-insensitive exact match
+            for (const [name, count] of map.entries()) {
+                if (name.toLowerCase() === itemName.toLowerCase()) {
+                    totalCount = count;
+                    foundItemName = name;
+                    break;
+                }
+            }
+            
+            // If still no match, try partial match
+            if (!foundItemName) {
+                for (const [name, count] of map.entries()) {
+                    if (name.toLowerCase().includes(itemName.toLowerCase()) || 
+                        itemName.toLowerCase().includes(name.toLowerCase())) {
+                        totalCount = count;
+                        foundItemName = name;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Count how many times the user has this item reserved
+        let yourCount = 0;
+        const { settings } = await chrome.storage.sync.get(['settings']);
+        const characterName = settings?.characterName;
+        
+        if (characterName && foundItemName && this.softresData?.playerReservesMap) {
+            const playerReservesData = this.softresData.playerReservesMap;
+            const playerReserves = playerReservesData[characterName] || [];
+            
+            // Count how many times this item appears in the user's reserves
+            yourCount = playerReserves.filter(item => 
+                item.toLowerCase() === foundItemName.toLowerCase()
+            ).length;
+        }
+        
+        const competitionCount = Math.max(0, totalCount - yourCount);
+        
+        return {
+            totalCount: totalCount,
+            competitionCount: competitionCount,
+            yourCount: yourCount
+        };
+    }
+
+    highlightItem(itemName, competitionLevel = 'medium') {
+        const colors = this.getCompetitionColors(competitionLevel);
+        
         // Find all elements containing the item name
         const walker = document.createTreeWalker(
             document.body,
@@ -472,11 +557,11 @@ class SoftresAnalyzer {
             const parent = textNode.parentElement;
             if (parent && !parent.classList.contains('minmaxer-highlight')) {
                 parent.classList.add('minmaxer-highlight');
-                parent.style.backgroundColor = '#ffcd3c33';
-                parent.style.border = '2px solid #ffcd3c';
+                parent.style.backgroundColor = colors.bgAlpha;
+                parent.style.border = `2px solid ${colors.border}`;
                 parent.style.borderRadius = '4px';
                 parent.style.padding = '2px';
-                parent.title = `MinMaxer: ${itemName} (BiS Item)`;
+                parent.title = `MinMaxer: ${itemName} (BiS Item - ${competitionLevel.charAt(0).toUpperCase() + competitionLevel.slice(1)} Competition)`;
                 
                 this.bisHighlights.push(parent);
             }
