@@ -16,7 +16,7 @@
     position: absolute;
     top: -5px;
     right: -5px;
-    background: currentColor;
+    background: var(--minmaxer-icon-color, #ffcd3c);
     color: white;
     border-radius: 50%;
     width: 20px;
@@ -27,7 +27,7 @@
     font-size: 10px;
     font-weight: bold;
     z-index: 1000;
-    mix-blend-mode: multiply;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* MinMaxer Sidebar Panel */

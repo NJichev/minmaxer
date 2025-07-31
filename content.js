@@ -561,6 +561,7 @@ class SoftresAnalyzer {
                 parent.style.border = `2px solid ${colors.border}`;
                 parent.style.borderRadius = '4px';
                 parent.style.padding = '2px';
+                parent.style.setProperty('--minmaxer-icon-color', colors.border);
                 parent.title = `MinMaxer: ${itemName} (BiS Item - ${competitionLevel.charAt(0).toUpperCase() + competitionLevel.slice(1)} Competition)`;
                 
                 this.bisHighlights.push(parent);
